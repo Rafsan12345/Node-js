@@ -96,5 +96,21 @@ project/
 npm init -y
 npm install express sqlite3 chart.js exceljs jsonwebtoken cors dotenv
 
-
 এরপর আপনার server.js এ import করে ব্যবহার করতে পারবে।
+
+
+
+
+ESP32
+  ↓ HTTP POST
+Node.js (/save)
+  ↓
+SQLite (database.db)
+  ↓
+Dashboard + Chart
+
+
+
+
+
+
