@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<h2>Database Dashboard</h2>
+
+<table border="1">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Value1</th>
+            <th>Value2</th>
+            <th>Time</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+</table>
+
+<br><br>
+
+<canvas id="myChart" width="600"></canvas>
+
+<script>
+fetch("/api/data")
+.then(res => res.json())
+.then(data => {
+
+    const body = document.getElementById("tableBody");
+    const labels = [];
+    const v1 = [];
+    const v2 = [];
+
+    body.innerHTML = "";
+
+    data.forEach(row => {
+        body.innerHTML += `
+            <tr>
+                <td>${row.id}</td>
+                <td>${row.value1}</td>
+                <td>${row.value2}</td>
+                <td>${row.time}</td>
+                <td>
+                    <button onclick="deleteRow(${row.id})">❌</button>
+                </td>
+            </tr>
+        `;
+
+        labels.push(row.time);
+        v1.push(Number(row.value1));
+        v2.push(Number(row.value2));
+    });
+
+    new Chart(document.getElementById("myChart"), {
+        type: "line",
+        data: {
+            labels: labels,
+            datasets: [
+                { label: "Value1", data: v1 },
+                { label: "Value2", data: v2 }
+            ]
+        }
+    });
+});
+
+function deleteRow(id) {
+    if (!confirm("Delete?")) return;
+
+    fetch(`/delete/${id}`, { method: "DELETE" })
+    .then(() => location.reload());
+}
+</script>
+
+</body>
+</html>
