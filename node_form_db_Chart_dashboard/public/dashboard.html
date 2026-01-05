@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>📊 Sensor Data Dashboard</h1>
+
+    <h2>All Records</h2>
+    <table id="dataTable">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Value1</th>
+                <th>Value2</th>
+                <th>Time</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+    <h2>Chart</h2>
+    <canvas id="myChart" width="600" height="300"></canvas>
+
+    <script>
+        async function fetchData() {
+            const res = await fetch('/api/records');
+            const data = await res.json();
+
+            // Table
+            const tbody = document.querySelector("#dataTable tbody");
+            tbody.innerHTML = "";
+            data.forEach(row => {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `<td>${row.id}</td><td>${row.value1}</td><td>${row.value2}</td><td>${row.time}</td>`;
+                tbody.appendChild(tr);
+            });
+
+            // Chart
+            const labels = data.map(r => r.time);
+            const value1 = data.map(r => r.value1);
+            const value2 = data.map(r => r.value2);
+
+            const ctx = document.getElementById('myChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Value1',
+                            data: value1,
+                            borderColor: 'red',
+                            fill: false
+                        },
+                        {
+                            label: 'Value2',
+                            data: value2,
+                            borderColor: 'blue',
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'top' }
+                    },
+                    scales: {
+                        x: { display: true, title: { display: true, text: 'Time' } },
+                        y: { display: true, title: { display: true, text: 'Value' } }
+                    }
+                }
+            });
+        }
+
+        fetchData();
+    </script>
+</body>
+</html>
